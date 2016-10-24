@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Log4j 2.x 配置文件，适用于Servlet 2.5 Web Applications。每30秒自动检查和应用配置文件的更新 -->
+<Configuration status="warn" monitorInterval="30">
+
+	<Properties>
+		<!-- 日志路径 -->
+		<Property name="filePath">../logs</Property>
+		<!-- 备份日志路径 -->
+		<Property name="fileBackupPath">../logs/$${date:yyyy-MM}</Property>
+		<!-- 日志分割阈值 -->
+		<Property name="maxSize">80M</Property>
+		<!-- 根据实际项目配置 -->
+		<Property name="projectName">cross</Property>
+	</Properties>
+
+	<Appenders>
+		<!-- 输出到控制台 -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%p] [%t] (%F-%L) - %m%n"/>
+		</Console>
+
+		<!-- 输出到文件，按天或者超过80MB分割 -->
+		<RollingFile name="RollingFile" fileName="${filePath}/${projectName}.log"
+			filePattern="${fileBackupPath}/${projectName}-sql-%d{yyyy-MM-dd}.log.gz">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%p] [%t] (%F-%L) - %m%n"/>
+			<Policies>
+				<OnStartupTriggeringPolicy/>
+				<TimeBasedTriggeringPolicy/>
+				<SizeBasedTriggeringPolicy size="${maxSize}"/>
+			</Policies>
+		</RollingFile>
+
+		<!-- SQL输出到文件，按天或者超过80MB分割 -->
+		<RollingFile name="RollingSqlFile" fileName="${filePath}/${projectName}-sql.log"
+			filePattern="${fileBackupPath}/${projectName}-sql-%d{yyyy-MM-dd}.log.gz">
+			<!-- 需要记录的级别 -->
+			<ThresholdFilter level="debug" onMatch="ACCEPT"
+				onMismatch="DENY"/>
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%p] [%t] (%F-%L) - %m%n"/>
+			<Policies>
+				<OnStartupTriggeringPolicy/>
+				<TimeBasedTriggeringPolicy/>
+				<SizeBasedTriggeringPolicy size="${maxSize}"/>
+			</Policies>
+		</RollingFile>
+	</Appenders>
+
+	<Loggers>
+		<!-- 全局配置 -->
+		<Root level="info">
+			<AppenderRef ref="Console"/>
+			<AppenderRef ref="RollingFile"/>
+		</Root>
+
+		<!-- 为sql语句配置特殊的Log级别，方便调试 -->
+		<Logger name="com.kevin.test.dao" level="debug" additivity="false">
+			<AppenderRef ref="RollingSqlFile"/>
+		</Logger>
+	</Loggers>
+
+</Configuration>
