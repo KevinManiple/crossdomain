@@ -1,15 +1,17 @@
 package com.kevin.test.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.kevin.test.common.constants.HttpConstant;
 import com.kevin.test.common.utils.MessageHandleUtil;
-import com.kevin.test.vo.UserCookie;
 
 /**
  * 跨域请求
@@ -18,20 +20,14 @@ import com.kevin.test.vo.UserCookie;
  */
 @RestController
 @RequestMapping(value = "api", produces = HttpConstant.APPLICATION_JSON)
-@CrossOrigin(origins = "http://img.kevin.com", allowedHeaders = "*", maxAge = 1800)
+@CrossOrigin(origins = "http://img.kevin.com", allowedHeaders = "*", methods = RequestMethod.POST, allowCredentials = "true", maxAge = 1800)
 public class CrossController {
     
     private static final Logger LOG = LogManager.getLogger(CrossController.class);
     
-    /**
-     * 测试请求
-     * 
-     * @param cookie
-     * @return
-     */
     @RequestMapping("getMessage")
-    public String getMessage(UserCookie cookie) {
-        LOG.info("请求成功! 参数：{}", JSON.toJSONString(cookie));
+    public String getMessage(HttpServletRequest request) {
+        LOG.info("请求成功! 参数：{}", JSON.toJSONString(request.getCookies()));
         return MessageHandleUtil.buildSuccessResult();
     }
 }
